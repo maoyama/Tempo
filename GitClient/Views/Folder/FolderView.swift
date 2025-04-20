@@ -415,12 +415,16 @@ struct FolderView: View {
             isLoading = true
             Task {
                 do {
-                    // Perform simple pull operation and check result after
+                    // Check if there was anything to pull before operation
+                    let hadChangesToPull = syncState.shouldPull
+                    
+                    // Perform pull operation
                     _ = try await Process.output(GitPull(directory: folder.url, refspec: branch?.name ?? "HEAD"))
                     await refreshModels()
                     
-                    // Show notification if there's nothing to pull after refresh
-                    if !syncState.shouldPull {
+                    // Only show "up to date" if there were no changes to pull originally
+                    // This prevents showing the notification after a successful pull of new changes
+                    if !hadChangesToPull && !syncState.shouldPull {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             showUpToDatePull = true
                         }
@@ -454,12 +458,16 @@ struct FolderView: View {
             isLoading = true
             Task {
                 do {
-                    // Perform simple push operation and check result after
+                    // Check if there was anything to push before operation
+                    let hadChangesToPush = syncState.shouldPush
+                    
+                    // Perform push operation
                     _ = try await Process.output(GitPush(directory: folder.url))
                     await updateModels()
                     
-                    // Show notification if there's nothing to push after refresh
-                    if !syncState.shouldPush {
+                    // Only show "up to date" if there were no changes to push originally
+                    // This prevents showing the notification after a successful push of new changes
+                    if !hadChangesToPush && !syncState.shouldPush {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             showUpToDatePush = true
                         }
