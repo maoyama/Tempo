@@ -8,7 +8,7 @@
 import Foundation
 
 struct GitPush: Git {
-    typealias OutputModel = Void
+    typealias OutputModel = String
     var arguments: [String] {
         [
             "git",
@@ -20,5 +20,7 @@ struct GitPush: Git {
     var directory: URL
     var refspec = "HEAD"
 
-    func parse(for stdOut: String) -> Void {}
+    func parse(for stdOut: String) -> String {
+        return stdOut
+    }
 }

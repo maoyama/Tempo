@@ -32,6 +32,8 @@ struct FolderView: View {
     @State private var searchTokens: [SearchToken] = []
     @State private var searchText = ""
     @State private var searchTask: Task<(), Never>?
+    @State private var showUpToDatePull = false
+    @State private var showUpToDatePush = false
 
     var body: some View {
         List(logStore.logs(), selection: $selectionLogID) { log in
@@ -144,6 +146,13 @@ struct FolderView: View {
             if isLoading {
                 ProgressView()
                     .scaleEffect(x: 0.5, y: 0.5, anchor: .center)
+            } else if showUpToDatePull || showUpToDatePush {
+                HStack(spacing: 2) {
+                    Image(systemName: "checkmark.circle.fill")
+                    Text("Already up to date")
+                }
+                .foregroundColor(.green)
+                .transition(.opacity)
             } else {
                 addBranchButton()
                     .padding(.trailing)
@@ -406,8 +415,22 @@ struct FolderView: View {
             isLoading = true
             Task {
                 do {
-                    try await Process.output(GitPull(directory: folder.url, refspec: branch!.name))
+                    // Perform simple pull operation and check result after
+                    _ = try await Process.output(GitPull(directory: folder.url, refspec: branch?.name ?? "HEAD"))
                     await refreshModels()
+                    
+                    // Show notification if there's nothing to pull after refresh
+                    if !syncState.shouldPull {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showUpToDatePull = true
+                        }
+                        Task {
+                            try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
+                            withAnimation {
+                                showUpToDatePull = false
+                            }
+                        }
+                    }
                 } catch {
                     self.error = error
                 }
@@ -431,8 +454,22 @@ struct FolderView: View {
             isLoading = true
             Task {
                 do {
-                    try await Process.output(GitPush(directory: folder.url))
+                    // Perform simple push operation and check result after
+                    _ = try await Process.output(GitPush(directory: folder.url))
                     await updateModels()
+                    
+                    // Show notification if there's nothing to push after refresh
+                    if !syncState.shouldPush {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showUpToDatePush = true
+                        }
+                        Task {
+                            try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
+                            withAnimation {
+                                showUpToDatePush = false
+                            }
+                        }
+                    }
                 } catch {
                     self.error = error
                 }
@@ -441,11 +478,11 @@ struct FolderView: View {
         } label: {
             Image(systemName: "arrow.up")
                 .overlay(alignment: .topTrailing, content: {
-                        badge()
-                            .animation(.default, body: { content in
-                                content
-                                    .opacity(syncState.shouldPush ? 1 : 0)
-                            })
+                    badge()
+                        .animation(.default, body: { content in
+                            content
+                                .opacity(syncState.shouldPush ? 1 : 0)
+                        })
                 })
         }
         .help("Push origin HEAD.")

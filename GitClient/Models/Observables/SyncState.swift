@@ -14,11 +14,15 @@ import Observation
     var branch: Branch?
     var shouldPull = false
     var shouldPush = false
+    var upToDatePull = false
+    var upToDatePush = false
 
     func sync() async throws {
         guard let folderURL, let branch, !branch.isDetached else {
             shouldPull = false
             shouldPush = false
+            upToDatePull = false
+            upToDatePush = false
             return
         }
         try await Process.output(GitFetch(directory: folderURL))
@@ -27,9 +31,13 @@ import Observation
         guard existRemoteBranch != nil else {
             shouldPull = false
             shouldPush = true
+            upToDatePull = false
+            upToDatePush = false
             return
         }
         shouldPull = !(try await Process.output(GitLog(directory: folderURL, revisionRange: "\(branch.name)..origin/\(branch.name)")).isEmpty)
         shouldPush = !(try await Process.output(GitLog(directory: folderURL, revisionRange: "origin/\(branch.name)..\(branch.name)")).isEmpty)
+        upToDatePull = false
+        upToDatePush = false
     }
 }
