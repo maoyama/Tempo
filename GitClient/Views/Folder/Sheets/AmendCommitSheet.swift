@@ -44,6 +44,7 @@ struct AmendCommitSheet: View {
                         }
                     }
                     .disabled(message.isEmpty)
+                    .buttonStyle(.borderedProminent)
                     .keyboardShortcut(.init(.return))
                 }
                 .padding(.top)

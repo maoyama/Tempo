@@ -49,6 +49,7 @@ struct RenameBranchSheet: View {
                             }
                         }
                     }
+                    .buttonStyle(.borderedProminent)
                     .keyboardShortcut(.init(.return))
                     .disabled(newBranchName.isEmpty)
                 }

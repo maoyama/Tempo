@@ -17,11 +17,7 @@ struct CommitDetailStackView: View {
             CommitDetailContentView(commit: commit, folder: folder)
                 .navigationDestination(for: String.self) { commitHash in
                     CommitDetailView(commitHash: commitHash, folder: folder)
-                        .safeAreaInset(edge: .top, spacing: 0, content: {
-                            BarBackButton(path: $path)
-                        })
                 }
-                .navigationBarBackButtonHidden()
         }
         .onChange(of: commit) { oldValue, newValue in
             path = []

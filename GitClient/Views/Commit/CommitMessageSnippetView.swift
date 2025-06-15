@@ -76,6 +76,7 @@ struct CommitMessageSnippetView: View {
                         self.error = error
                     }
                 }
+                .buttonStyle(.borderedProminent)
                 .keyboardShortcut(.init(.return))
                 .disabled(editCommitMessageSnippet.isEmpty)
                 .padding()

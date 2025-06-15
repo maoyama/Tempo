@@ -268,6 +268,7 @@ struct CommitCreateView: View {
                             }
                         }
                     }
+                    .buttonStyle(.borderedProminent)
                     .keyboardShortcut(.init(.return))
                     .disabled(cachedDiffRaw.isEmpty || commitMessage.isEmpty)
                     Toggle("Amend", isOn: $isAmend)

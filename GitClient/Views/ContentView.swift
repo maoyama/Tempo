@@ -67,15 +67,17 @@ struct ContentView: View {
                         panel.canCreateDirectories = false
                         panel.begin { (response) in
                             if response == .OK {
-                                for fileURL in panel.urls {
-                                    let chooseFolder = Folder(url: fileURL)
-                                    var folders = decodedFolders
-                                    folders.removeAll { $0 == chooseFolder }
-                                    folders.insert(chooseFolder, at: 0)
-                                    do {
-                                        try self.folders = JSONEncoder().encode(folders)
-                                    } catch {
-                                        self.error = error
+                                Task { @MainActor in
+                                    for fileURL in panel.urls {
+                                        let chooseFolder = Folder(url: fileURL)
+                                        var folders = decodedFolders
+                                        folders.removeAll { $0 == chooseFolder }
+                                        folders.insert(chooseFolder, at: 0)
+                                        do {
+                                            try self.folders = JSONEncoder().encode(folders)
+                                        } catch {
+                                            self.error = error
+                                        }
                                     }
                                 }
                             }
