@@ -224,7 +224,15 @@ struct CommitCreateView: View {
                             Task {
                                 isGeneratingCommitMessage = true
                                 do {
-                                    commitMessage = try await AIService(bearer: openAIAPISecretKey).commitMessage(stagedDiff: cachedDiffRaw)
+                                    // TODO: どのModelを利用するかどうかハンドリング
+                                    if #available(macOS 26.0, *) {
+                                        commitMessage = try await SystemLanguageModelService().commitMessage(stagedDiff: cachedDiffRaw)
+                                    } else {
+
+
+                                        commitMessage = try await AIService(bearer: openAIAPISecretKey).commitMessage(stagedDiff: cachedDiffRaw)
+                                    }
+
                                 } catch {
                                     self.error = error
                                 }

@@ -19,7 +19,7 @@ struct MergeCommitContentView: View {
             .onChange(of: mergeCommit, initial: true) {
                 Task {
                     do {
-                        commits = try await Array(Process.output(GitLog(directory: directoryURL, revisionRange: "\(mergeCommit.parentHashes[0])..\(mergeCommit.hash)")).dropFirst())
+                        commits = try await Array(Process.output(GitLog(directory: directoryURL, revisionRange: ["\(mergeCommit.parentHashes[0])..\(mergeCommit.hash)"])).dropFirst())
                         let diffRaw = try await Process.output(
                             GitDiff(directory: directoryURL, noRenames: false, commitRange: mergeCommit.parentHashes[0] + ".." + mergeCommit.hash)
                         )

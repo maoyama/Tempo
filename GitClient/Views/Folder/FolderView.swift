@@ -105,7 +105,7 @@ struct FolderView: View {
                 if !suggestSearchToken.isEmpty {
                     Section("History") {
                         ForEach(suggestSearchToken) { token in
-                            HStack {
+                            VStack(alignment: .leading) {
                                 Text(token.kind.label)
                                     .foregroundStyle(.secondary)
                                 Text(token.text)
@@ -134,7 +134,7 @@ struct FolderView: View {
                 }
             } else {
                 ForEach(SearchKind.allCases, id: \.self) { kind in
-                    HStack {
+                    VStack(alignment: .leading) {
                         Text(kind.label)
                             .foregroundStyle(.secondary)
                         Text(searchText)
@@ -211,9 +211,17 @@ struct FolderView: View {
         .navigationTitle(branch?.name ?? "")
         .toolbar {
             if isLoading {
-                ToolbarItem(placement: .primaryAction) {
-                    ProgressView()
-                        .scaleEffect(x: 0.5, y: 0.5, anchor: .center)
+                if #available(macOS 26.0, *) {
+                    ToolbarItem(placement: .primaryAction) {
+                        ProgressView()
+                            .scaleEffect(x: 0.5, y: 0.5, anchor: .center)
+                    }
+                    .sharedBackgroundVisibility(.hidden)
+                } else {
+                    ToolbarItem(placement: .primaryAction) {
+                        ProgressView()
+                            .scaleEffect(x: 0.5, y: 0.5, anchor: .center)
+                    }
                 }
             } else {
                 ToolbarItem(placement: .principal) {
@@ -221,15 +229,18 @@ struct FolderView: View {
                 }
                 ToolbarItem(placement: .principal) {
                     addBranchButton()
-                        .padding(.trailing)
+                }
+                if #available(macOS 26.0, *) {
+                    ToolbarSpacer(.fixed, placement: .principal)
                 }
                 ToolbarItem(placement: .principal) {
                     tagButton()
-                        .padding(.trailing)
+                }
+                if #available(macOS 26.0, *) {
+                    ToolbarSpacer(.fixed, placement: .principal)
                 }
                 ToolbarItem(placement: .principal) {
                     stashButton()
-                        .padding(.trailing)
                 }
                 ToolbarItem(placement: .primaryAction) {
                     pullButton()

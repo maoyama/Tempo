@@ -143,12 +143,12 @@ struct CommitDetailContentView: View {
                         merges: true,
                         ancestryPath: true,
                         reverse: true,
-                        revisionRange: "\(commit.hash)..HEAD"
+                        revisionRange: ["\(commit.hash)..HEAD"]
                     )).first
                     if let mergeCommit {
                         let mergedInCommits = try await Process.output(GitLog(
                             directory: folder.url,
-                            revisionRange: "\(mergeCommit.parentHashes[0])..\(mergeCommit.hash)"
+                            revisionRange: ["\(mergeCommit.parentHashes[0])..\(mergeCommit.hash)"]
                         ))
                         let contains = mergedInCommits.contains { $0.hash == commit.hash }
                         if contains  {
